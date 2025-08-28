@@ -14,7 +14,7 @@ export default function Analytics() {
     const token = localStorage.getItem("token");
 
     const evtSource = new EventSourcePolyfill(
-      "http://localhost:5000/api/analytics/stream",
+      "https://applyly-4r4o.onrender.com/api/analytics/stream",
       { headers: { Authorization: `Bearer ${token}` } }
     );
 

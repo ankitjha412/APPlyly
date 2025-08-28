@@ -1,9 +1,15 @@
+
+
+
+
+
+
 import { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import api from "../utils/api";
 
 export default function Profile() {
-  const { user, logout } = useContext(AuthContext);
+  const { user, setUser, logout } = useContext(AuthContext);
   const [formData, setFormData] = useState({
     name: user?.name || "",
     company: user?.company || "",
@@ -16,12 +22,27 @@ export default function Profile() {
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
+  // 🔄 Helper: refetch latest user
+  const refreshUser = async () => {
+    try {
+      const me = await api.get("/auth/me");
+      setUser(me.data.user);
+    } catch (err) {
+      console.error("Error refreshing user:", err);
+    }
+  };
+
   const handleUpdate = async () => {
     try {
       setLoading(true);
       await api.put("/recruiter/update", formData);
+
+      // ✅ refetch user
+      await refreshUser();
+
       setMessage("✅ Profile updated successfully!");
       setLoading(false);
+      setFile(null);
     } catch {
       setMessage("❌ Error updating profile");
       setLoading(false);
@@ -34,12 +55,17 @@ export default function Profile() {
       setLoading(true);
       const form = new FormData();
       form.append("profilePic", file);
+
       await api.put("/recruiter/profile-pic", form, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+
+      // ✅ refetch user
+      await refreshUser();
+
       setMessage("✅ Profile picture updated!");
       setLoading(false);
-      window.location.reload();
+      setFile(null);
     } catch {
       setMessage("❌ Error uploading picture");
       setLoading(false);
@@ -66,15 +92,17 @@ export default function Profile() {
             </div>
           )}
 
-          <div className="mt-3 flex gap-2">
-           <label className="flex flex-col items-center justify-center w-40 h-10 border-2 border-dashed border-gray-500 rounded-lg cursor-pointer bg-gray-700 hover:bg-gray-600 transition">
-  <span className="text-sm text-gray-300">Choose Image</span>
-  <input
-    type="file"
-    onChange={(e) => setFile(e.target.files[0])}
-    className="hidden"
-  />
-</label>
+          <div className="mt-3 flex flex-1 gap-2 items-center">
+            <label className="flex flex-col items-center justify-center w-40 h-10 border-2 border-dashed border-gray-500 rounded-lg cursor-pointer bg-gray-700 hover:bg-gray-600 transition">
+              <span className="text-sm text-gray-300">
+                {file ? file.name : "Choose Image"}
+              </span>
+              <input
+                type="file"
+                onChange={(e) => setFile(e.target.files[0])}
+                className="hidden"
+              />
+            </label>
             <button
               onClick={handleUpload}
               className="px-3 py-1 bg-white text-black hover:bg-black hover:text-white rounded-md text-sm cursor-pointer"
@@ -148,11 +176,6 @@ export default function Profile() {
         {message && (
           <p className="mt-2 text-center text-sm text-white">{message}</p>
         )}
-
-        {/* Logout Button */}
-        <div className="mt-4 flex justify-center">
-          
-        </div>
       </div>
     </div>
   );

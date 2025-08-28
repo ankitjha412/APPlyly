@@ -48,7 +48,7 @@ export default function ApplicationForm() {
   };
 
   return (
-    <div className="flex justify-center items-center h-[99%] bg-gray-900">
+    <div className="flex justify-center items-center min-h bg-gray-900">
       <div className="max-w-2xl w-full bg-gray-800 text-white p-8 rounded-lg shadow-md">
         <h1 className="text-2xl font-bold mb-6 text-center">Add Candidate</h1>
 
@@ -96,33 +96,39 @@ export default function ApplicationForm() {
               className="w-full p-2 rounded bg-gray-700 border border-gray-600"
             />
           </div>
-         <div>
-  <label className="block mb-1">Resume (PDF)</label>
-  <label className="flex flex-col items-center justify-center w-full h-8 border-2 border-dashed border-gray-500 rounded-lg cursor-pointer bg-gray-700 hover:bg-gray-600 transition">
-    <span className="text-sm text-gray-300">Click to upload Resume (PDF)</span>
-    <input
-      type="file"
-      accept="application/pdf"
-      onChange={(e) => setResume(e.target.files[0])}
-      className="hidden"
-      required
-    />
-  </label>
-</div>
 
-<div>
-  <label className="block mb-1">Profile Image (optional)</label>
-  <label className="flex flex-col items-center justify-center w-full h-8 border-2 border-dashed border-gray-500 rounded-lg cursor-pointer bg-gray-700 hover:bg-gray-600 transition">
-    <span className="text-sm text-gray-300">Click to upload Profile Image</span>
-    <input
-      type="file"
-      accept="image/*"
-      onChange={(e) => setProfileImage(e.target.files[0])}
-      className="hidden"
-    />
-  </label>
-</div>
+          {/* Resume Upload */}
+          <div>
+            <label className="block mb-1">Resume (PDF)</label>
+            <label className="flex flex-col items-center justify-center w-full h-10 border-2 border-dashed border-gray-500 rounded-lg cursor-pointer bg-gray-700 hover:bg-gray-600 transition">
+              <span className="text-sm text-gray-300">
+                {resume ? resume.name : "Click to upload Resume (PDF)"}
+              </span>
+              <input
+                type="file"
+                accept="application/pdf"
+                onChange={(e) => setResume(e.target.files[0])}
+                className="hidden"
+                required
+              />
+            </label>
+          </div>
 
+          {/* Profile Image Upload */}
+          <div>
+            <label className="block mb-1">Profile Image (optional)</label>
+            <label className="flex flex-col items-center justify-center w-full h-10 border-2 border-dashed border-gray-500 rounded-lg cursor-pointer bg-gray-700 hover:bg-gray-600 transition">
+              <span className="text-sm text-gray-300">
+                {profileImage ? profileImage.name : "Click to upload Profile Image"}
+              </span>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setProfileImage(e.target.files[0])}
+                className="hidden"
+              />
+            </label>
+          </div>
 
           <button
             type="submit"
