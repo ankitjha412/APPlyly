@@ -73,32 +73,83 @@ exports.analyticsSummary = async (req, res) => {
 };
 
 
+// exports.analyticsSSE = async (req, res) => {
+//   res.set({
+//     "Content-Type": "text/event-stream",
+//     "Cache-Control": "no-cache",
+//     "Connection": "keep-alive",
+//     "Access-Control-Allow-Origin": ["http://localhost:5173""https://ap-plyly.vercel.app/applications"],
+//     "Access-Control-Allow-Credentials": "true"
+//   });
+//   res.flushHeaders?.();
+
+//   const match = buildMatch(req);
+
+//   const initial = await computeSummary(match);
+//   console.log("Sending initial summary:", initial); 
+//   res.write(`event: summary\ndata:${JSON.stringify(initial)}\n\n`);
+
+//   let changeStream;
+//   try {
+//     const pipeline = [
+//       { $match: { 'fullDocument.recruiter': new mongoose.Types.ObjectId(req.user._id) } }
+//     ];
+//     changeStream = Application.watch(pipeline, { fullDocument: "updateLookup" });
+
+//     changeStream.on("change", async () => {
+//       const data = await computeSummary(match);
+//       console.log("Change detected, sending summary:", data); 
+//       res.write(`event: summary\ndata:${JSON.stringify(data)}\n\n`);
+//     });
+//   } catch (e) {
+//     console.warn("Change streams not available, falling back to polling:", e.message);
+//     const interval = setInterval(async () => {
+//       const data = await computeSummary(match);
+//       res.write(`event: summary\ndata:${JSON.stringify(data)}\n\n`);
+//     }, 5000);
+//     req.on("close", () => clearInterval(interval));
+//   }
+
+//   req.on("close", () => {
+//     changeStream?.close();
+//     res.end();
+//   });
+// };
+
+
 exports.analyticsSSE = async (req, res) => {
-  res.set({
-    "Content-Type": "text/event-stream",
-    "Cache-Control": "no-cache",
-    "Connection": "keep-alive",
-    "Access-Control-Allow-Origin": ["http://localhost:5173","https://ap-plyly.vercel.app/applications"],
-    "Access-Control-Allow-Credentials": "true"
-  });
+  const allowedOrigins = [
+    "http://localhost:5173",
+    "https://ap-plyly.vercel.app"
+  ];
+  const origin = req.headers.origin;
+
+  // ✅ Set CORS headers for SSE
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  }
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+
   res.flushHeaders?.();
 
   const match = buildMatch(req);
 
+  // send initial summary
   const initial = await computeSummary(match);
-  console.log("Sending initial summary:", initial); 
   res.write(`event: summary\ndata:${JSON.stringify(initial)}\n\n`);
 
   let changeStream;
   try {
     const pipeline = [
-      { $match: { 'fullDocument.recruiter': new mongoose.Types.ObjectId(req.user._id) } }
+      { $match: { "fullDocument.recruiter": new mongoose.Types.ObjectId(req.user._id) } }
     ];
     changeStream = Application.watch(pipeline, { fullDocument: "updateLookup" });
 
     changeStream.on("change", async () => {
       const data = await computeSummary(match);
-      console.log("Change detected, sending summary:", data); 
       res.write(`event: summary\ndata:${JSON.stringify(data)}\n\n`);
     });
   } catch (e) {
