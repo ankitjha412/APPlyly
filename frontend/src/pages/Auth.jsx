@@ -111,7 +111,7 @@ export default function Auth() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2 bg-white text-black hover:bg-black hover:text-white rounded-lg transition font-medium flex items-center justify-center"
+              className="w-full py-2 bg-white text-black hover:bg-black hover:text-white rounded-lg transition font-medium flex items-center justify-center cursor-pointer"
             >
               {loading ? (
                 <div className="w-5 h-5 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
@@ -127,7 +127,7 @@ export default function Auth() {
             {isLogin ? "Don’t have an account?" : "Already have an account?"}{" "}
             <button
               onClick={() => setIsLogin(!isLogin)}
-              className="text-white hover:underline"
+              className="text-white hover:underline cursor-pointer"
             >
               {isLogin ? "Sign Up" : "Login"}
             </button>
