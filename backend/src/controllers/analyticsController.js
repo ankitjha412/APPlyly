@@ -78,7 +78,7 @@ exports.analyticsSSE = async (req, res) => {
     "Content-Type": "text/event-stream",
     "Cache-Control": "no-cache",
     "Connection": "keep-alive",
-    "Access-Control-Allow-Origin": "http://localhost:5173",
+    "Access-Control-Allow-Origin": ["http://localhost:5173","https://ap-plyly.vercel.app/applications"],
     "Access-Control-Allow-Credentials": "true"
   });
   res.flushHeaders?.();
